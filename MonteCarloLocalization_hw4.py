@@ -5,16 +5,16 @@ import numpy as np
 
 class MCL:
 
-    def __init__(self,alpha = np.array([0.1,0.01,0.01,0.1]),
+    def __init__(self,dt = 0.1,
+                      alpha = np.array([0.1,0.01,0.01,0.1]),
                       sig_r = 0.1,
                       sig_ph = 0.05,
-                      M = 1000,
-                      t_prev = 0):
+                      M = 1000):
+        self.dt = dt
         self.alpha = alpha #control noise characteristics
         self.sig_r = sig_r #sensor noise (range)
         self.sig_ph = sig_ph #sensor noise (bearing)
         self.M = M # number of particles
-        self.t_prev = t_prev
 
     def prob_normal_distribution(self, a, std):
         return np.exp(-(a**2)/(2*std**2)) / np.sqrt(2*np.pi*std**2)
@@ -32,14 +32,12 @@ class MCL:
             ki[:,k-1] = ki_bar[:,i]
         return ki
 
-    def MCL_Localization(self, ki_past, u, z, m, t):
+    def MCL_Localization(self, ki_past, u, z, m):
         #sample the motion model
-        dt = t - self.t_prev
-        self.t_prev = t
         if np.size(m,0) != np.size(z,1):
             print("error: range and bearing measurements do not match landmark count")
-        v_hat = u[0] # measured velocity
-        w_hat = u[1] # measured angular velocity
+        v_hat = u[0] + (self.alpha[0] * u[0]**2 + self.alpha[1] * u[1]**2) * np.random.randn(self.M) #estimated velocity
+        w_hat = u[1] + (self.alpha[2] * u[0]**2 + self.alpha[3] * u[1]**2) * np.random.randn(self.M) #estimated angular velocity
         ki_bar_x = ki_past[0,:] - v_hat/w_hat * np.sin(ki_past[2,:])  + v_hat/w_hat*np.sin(ki_past[2,:]+w_hat*self.dt) #propogate particles (x pos)
         ki_bar_y = ki_past[1,:] + v_hat/w_hat * np.cos(ki_past[2,:]) -  v_hat/w_hat*np.cos(ki_past[2,:]+w_hat*self.dt) #propogate particles (y pos)
         ki_bar_th = ki_past[2,:] + w_hat*self.dt #propogate particles (theta angle)
