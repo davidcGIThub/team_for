@@ -6,13 +6,11 @@ class MCL:
     def __init__(self,alpha = np.array([0.1,0.01,0.01,0.1]),
                       sig_r = 0.1,
                       sig_ph = 0.05,
-                      M = 1000,
-                      t_prev = 0):
+                      M = 1000):
         self.alpha = alpha #control noise characteristics
         self.sig_r = sig_r #sensor noise (range)
         self.sig_ph = sig_ph #sensor noise (bearing)
         self.M = M # number of particles
-        self.t_prev = t_prev
 
     def prob_normal_distribution(self, a, std):
         return np.exp(-(a**2)/(2*std**2)) / np.sqrt(2*np.pi*std**2)
@@ -31,14 +29,12 @@ class MCL:
         return ki
 
 
-    def MCL_Localization(self, ki_past, u, z, m, t):
+    def MCL_Localization(self, ki_past, u, z, m, dt):
         #sample the motion model
-        dt = t - self.t_prev
-        self.t_prev = t
         v_hat = u[0] # measured velocity
         w_hat = u[1] # measured angular velocity
-        ki_bar_x = ki_past[0,:] - v_hat/w_hat * np.sin(ki_past[2,:])  + v_hat/w_hat*np.sin(ki_past[2,:]+w_hat*dt) #propogate particles (x pos)
-        ki_bar_y = ki_past[1,:] + v_hat/w_hat * np.cos(ki_past[2,:]) -  v_hat/w_hat*np.cos(ki_past[2,:]+w_hat*dt) #propogate particles (y pos)
+        ki_bar_x = ki_past[0,:] + v_hat*dt*np.cos(ki_past[2,:]) #propogate particles (x pos)
+        ki_bar_y = ki_past[1,:] + v_hat*dt*np.sin(ki_past[2,:]) #propogate particles (y pos)
         ki_bar_th = ki_past[2,:] + w_hat*dt #propogate particles (theta angle)
         ki_bar = np.array([ki_bar_x, ki_bar_y, ki_bar_th]) 
         #if a landmark was measured in that timestep
