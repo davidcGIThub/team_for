@@ -1,8 +1,6 @@
 #Monte Carlo
 import numpy as np 
 
-
-
 class MCL:
 
     def __init__(self,alpha = np.array([0.1,0.01,0.01,0.1]),
