@@ -30,14 +30,8 @@ for i in range(0,np.size(odom_t)):
         ind_t -= 1
     #l_time_ind[i] = ind
     time_l[i] = l_time[ind_t]
-    ind_l = np.argwhere(~np.isnan(l_bearing[:,ind_t]))
-    if np.size(ind_l) < 1:
-        ind_l = -1
-    else:
-        ind_l = ind_l[0,0]
-    id_l[i] = ind_l
-    bearing_l[i] = l_bearing[ind_l,ind_t]
-    range_l[i] = l_depth[ind_l,ind_t]
+    bearing_l[i] = l_bearing[:,ind_t]
+    range_l[i] = l_depth[:,ind_t]
 
 #map the truth data to the odmetry time
 x_true = np.interp(odom_t,t_truth,x_truth)
