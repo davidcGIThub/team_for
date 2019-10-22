@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from MonteCarloLocalization import MCL
 import matplotlib.animation as animation
 from scipy.io import loadmat
+from RobotMotion import RobotMotion as rbm 
 from LandmarkModel import LandmarkModel as lmm 
 from parameters import *
 from dataInitialization import *
@@ -13,8 +14,8 @@ from dataInitialization import *
 #Initialize Estimation Objects
 rb = rbm(x0,y0,theta0,alpha1,alpha2,alpha3,alpha4)
 rb_est = rbm(x0,y0,theta0,alpha1,alpha2,alpha3,alpha4)
-meas = lmm(sig_r , sig_b)
-mcl = MCL(dt,alpha,sig_r,sig_b,M)
+meas = lmm(range_l, bearing_l, landmarks)
+mcl = MCL(M)
 ki_x = np.random.uniform(-10,10,M)
 ki_y = np.random.uniform(-10,10,M)
 ki_th = np.random.uniform(0,2*np.pi,M)
@@ -33,6 +34,8 @@ lmd_figs, = ax.plot([],[], 'bo', ms=ms)
 lmd_meas_figs, = ax.plot([],[], 'ko', fillstyle = 'none', ms=ms)
 particles, = ax.plot([],[], 'ko', ms=1)
 
+dt = t[i]
+
 def init():
     #initialize animation
     ax.add_patch(robot_fig)
@@ -44,24 +47,24 @@ def init():
     return robot_fig, robot_est_fig, time_text, lmd_figs, lmd_meas_figs, particles
 
 def animate(i):
-    global rb, rb_est,ki, meas, t, vc, wc, mu, ms
-    #propogate robot motion
-    u = np.array([vc[i],wc[i]])
+    global rb, rb_est,ki, meas, t, vel_odom, mu, ms, dt
+    #update true robot position
     rb_est.setState(x_true[i],y_true[i],th_true[i])
     robot_fig.xy  = rb.getPoints()
     state = rb.getState()
     #measure landmark position
-    landmarks_meas = meas.getLandmarks(state,m)
-    Ranges = meas.getRanges(state,m)
-    Bearings = meas.getBearings(state,m)
-    z = np.array([Ranges.flatten(), Bearings.flatten()])
-    lmd_meas_figs.set_data(landmarks_meas[:,0], landmarks_meas[:,1])
+    z = meas.getMeasurements(i)
+    landmark_estimates = meas.getLandmarkEstimates(state,i)
+    lmd_meas_figs.set_data(landmark_estimates[:,0], landmark_estimates[:,1])
     lmd_meas_figs.set_markersize(ms)
     #particles
     particles.set_data(ki[0,:], ki[1,:])
     particles.set_markersize(1)
     #estimate robot motion
-    (ki, mu, P)  = mcl.MCL_Localization(ki,u,z,m)
+    u = np.array([vel_odom[0,i],vel_odom[1,i]])
+    if i > 0: 
+        dt = t[i] - t[i-1]
+    (ki, mu, P)  = mcl.MCL_Localization(ki,u,z,m,dt)
     rb_est.setState(mu[0],mu[1],mu[2])
     robot_est_fig.xy  = rb_est.getPoints()
     #update time
@@ -99,12 +102,6 @@ ax2.set(ylabel = 'y position (m)')
 ax3.plot(t,theta_true)
 ax3.plot(t,theta_est)
 ax3.set(ylabel = 'heading (deg)', xlabel= ("time (s)"))
-if given:
-    ax1.plot(t,x_given, label = 'given')
-    ax1.legend()
-    ax2.plot(t,y_given)
-    ax3.plot(t,theta_given)
-plt.show()
 
 figure2, (ax1, ax2, ax3) = plt.subplots(3,1)
 ax1.plot(t,x_true-x_est, label = 'error', color = 'b')

@@ -3,13 +3,7 @@ import numpy as np
 
 class MCL:
 
-    def __init__(self,alpha = np.array([0.1,0.01,0.01,0.1]),
-                      sig_r = 0.1,
-                      sig_ph = 0.05,
-                      M = 1000):
-        self.alpha = alpha #control noise characteristics
-        self.sig_r = sig_r #sensor noise (range)
-        self.sig_ph = sig_ph #sensor noise (bearing)
+    def __init__(self, M = 1000):
         self.M = M # number of particles
 
     def prob_normal_distribution(self, a, std):

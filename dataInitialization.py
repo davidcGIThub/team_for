@@ -53,5 +53,3 @@ theta_est = t * 0
 cov = np.zeros([3,3,np.size(t)])
 state = np.array([x0,y0,theta0])
 mu = np.array([x0,y0,theta0])
-m = landmarks
-len_m = np.size(m,0)
