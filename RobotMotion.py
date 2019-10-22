@@ -5,19 +5,11 @@ class RobotMotion:
 
     def __init__(self, 
                  x = -5.0, 
-                 y = -3.0, 
-                 theta = np.pi/2.0, 
-                 alpha1 = 0.1,
-                 alpha2 = 0.01,
-                 alpha3 = 0.01,
-                 alpha4 = 0.1):
+                 y = -3.0,
+                 theta = 0):
         self.x = x
         self.y = y
         self.theta = theta
-        self.alpha1 = alpha1
-        self.alpha2 = alpha2
-        self.alpha3 = alpha3
-        self.alpha4 = alpha4
     
     def setState(self,x,y,theta):
         self.x = x

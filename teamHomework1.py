@@ -12,14 +12,10 @@ from dataInitialization import *
 
 
 #Initialize Estimation Objects
-rb = rbm(x0,y0,theta0,alpha1,alpha2,alpha3,alpha4)
-rb_est = rbm(x0,y0,theta0,alpha1,alpha2,alpha3,alpha4)
+rb = rbm(x0,y0,theta0)
+rb_est = rbm(x0,y0,theta0)
 meas = lmm(range_l, bearing_l, landmarks)
 mcl = MCL(M)
-ki_x = np.random.uniform(-10,10,M)
-ki_y = np.random.uniform(-10,10,M)
-ki_th = np.random.uniform(0,2*np.pi,M)
-ki = np.array([ki_x, ki_y, ki_th])
 
 #initialize figures
 fig = plt.figure()
@@ -33,7 +29,7 @@ ms = 12
 lmd_figs, = ax.plot([],[], 'bo', ms=ms)
 lmd_meas_figs, = ax.plot([],[], 'ko', fillstyle = 'none', ms=ms)
 particles, = ax.plot([],[], 'ko', ms=1)
-
+animation_speed = 100
 dt = t[i]
 
 def init():
@@ -41,7 +37,7 @@ def init():
     ax.add_patch(robot_fig)
     ax.add_patch(robot_est_fig)
     time_text.set_text('0.0')
-    lmd_figs.set_data(m[:,0],m[:,1])
+    lmd_figs.set_data(landmarks[:,0],landmarks[:,1])
     lmd_meas_figs.set_data([],[])
     particles.set_data(ki[0,:],ki[1,:])
     return robot_fig, robot_est_fig, time_text, lmd_figs, lmd_meas_figs, particles
@@ -49,11 +45,10 @@ def init():
 def animate(i):
     global rb, rb_est,ki, meas, t, vel_odom, mu, ms, dt
     #update true robot position
-    rb_est.setState(x_true[i],y_true[i],th_true[i])
+    rb_est.setState(x_true[i],y_true[i],theta_true[i])
     robot_fig.xy  = rb.getPoints()
     state = rb.getState()
-    #measure landmark position
-    z = meas.getMeasurements(i)
+    #estimate landmark position
     landmark_estimates = meas.getLandmarkEstimates(state,i)
     lmd_meas_figs.set_data(landmark_estimates[:,0], landmark_estimates[:,1])
     lmd_meas_figs.set_markersize(ms)
@@ -61,6 +56,8 @@ def animate(i):
     particles.set_data(ki[0,:], ki[1,:])
     particles.set_markersize(1)
     #estimate robot motion
+    z = meas.getMeasurements(i)
+    m = meas.getLandmarks(i)
     u = np.array([vel_odom[0,i],vel_odom[1,i]])
     if i > 0: 
         dt = t[i] - t[i-1]
@@ -70,9 +67,6 @@ def animate(i):
     #update time
     time_text.set_text('time = %.1f' % t[i])
     #save state information
-    x_true[i] = state[0]
-    y_true[i] = state[1]
-    theta_true[i] = state[2]
     x_est[i] = mu[0]
     y_est[i] = mu[1]
     theta_est[i] = mu[2]

@@ -36,7 +36,7 @@ for i in range(0,np.size(odom_t)):
 #map the truth data to the odmetry time
 x_true = np.interp(odom_t,t_truth,x_truth)
 y_true = np.interp(odom_t,t_truth,y_truth)
-th_true = np.interp(odom_t,t_truth,th_truth)
+theta_true = np.interp(odom_t,t_truth,th_truth)
 
 #Other data to initialize
 x0 = pos_odom_se2[0,0]
@@ -44,12 +44,16 @@ y0 = pos_odom_se2[1,0]
 theta0 = pos_odom_se2[2,0]
 
 t = odom_t
-x_true = t * 0
-y_true = t * 0
-theta_true = t * 0
 x_est = t * 0
 y_est = t * 0
 theta_est = t * 0
 cov = np.zeros([3,3,np.size(t)])
 state = np.array([x0,y0,theta0])
 mu = np.array([x0,y0,theta0])
+
+#initialize particles
+M = 1000 #number of particles
+ki_x = np.random.uniform(-10,10,M)
+ki_y = np.random.uniform(-10,10,M)
+ki_th = np.random.uniform(0,2*np.pi,M)
+ki = np.array([ki_x, ki_y, ki_th])
