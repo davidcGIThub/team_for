@@ -28,7 +28,8 @@ class LandmarkModel:
         id_list = self.getLandmarkIDs(index)
         ranges = self.range_meas[id_list, index]
         bearings = self.bearing_meas[id_list, index]
-        bearings = (( -bearings + np.pi) % (2.0 * np.pi ) - np.pi) * -1.0
+        # bearings = (( -bearings + np.pi) % (2.0 * np.pi ) - np.pi) * -1.0
+        # bearings -= np.pi * 2 * np.floor((bearings + np.pi) / (2 * np.pi))
         r_b = np.concatenate((ranges[:,None],bearings[:,None]),1)
         return r_b
 
@@ -36,7 +37,8 @@ class LandmarkModel:
         # return the estimated x an y positions calculated from the measured range and bearing, and estimated pose
         id_list = self.getLandmarkIDs(index)
         bearings = self.bearing_meas[id_list, index]
-        bearings = (( -bearings + np.pi) % (2.0 * np.pi ) - np.pi) * -1.0
+        # bearings = (( -bearings + np.pi) % (2.0 * np.pi ) - np.pi) * -1.0
+        # bearings -= np.pi * 2 * np.floor((bearings + np.pi) / (2 * np.pi))
         ranges = self.range_meas[id_list, index]
         x = ranges * np.cos(bearings + pose[2]) + pose[0]
         y = ranges * np.sin(bearings + pose[2]) + pose[1]

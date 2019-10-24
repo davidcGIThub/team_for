@@ -35,11 +35,13 @@ for i in range(0, np.size(odom_t)):
     bearing_l[:, i] = l_bearing[:, ind_t]
     range_l[:, i] = l_depth[:, ind_t]
 
+
 # map the truth data to the odometry time
 x_true = np.interp(odom_t, t_truth, x_truth)
 y_true = np.interp(odom_t, t_truth, y_truth)
 theta_true = np.interp(odom_t, t_truth, th_truth)
-theta_true = (( -theta_true + np.pi) % (2.0 * np.pi ) - np.pi) * -1.0
+# theta_true = (( -theta_true + np.pi) % (2.0 * np.pi ) - np.pi) * -1.0
+#theta_true -= np.pi * 2 * np.floor((theta_true + np.pi) / (2 * np.pi))
 
 # Other data to initialize
 x0 = pos_odom_se2[0, 0]

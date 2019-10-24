@@ -45,8 +45,10 @@ class MCL:
                 Bearing_ki = np.arctan2(m[i, 1] - ki_bar_y, m[i, 0] - ki_bar_x) - ki_bar_th  # bearing of particles
                 print("Range_Error", np.mean(Range_ki - Range) , "Bearing_Error", np.mean(Bearing_ki - Bearing))
                 prob_R = self.prob_normal_distribution(Range_ki - Range, self.sig_r)  # range probability
-                prob_B = self.prob_normal_distribution(Bearing_ki - Bearing, self.sig_ph)  # bearing probability
-                w = w + prob_R + prob_B # weights
+                bearing_diff = Bearing_ki - Bearing
+                bearing_diff -= np.pi * 2 * np.floor((bearing_diff + np.pi) / (2 * np.pi))
+                prob_B = self.prob_normal_distribution(bearing_diff, self.sig_ph)  # bearing probability
+                w = w * prob_R * prob_B # weights
             # Resampling
             w = w / np.sum(w)  # normalize the weights
             ki = self.low_variance_sampler(ki_bar, w)  # particles
