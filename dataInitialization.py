@@ -8,6 +8,7 @@ t_truth = truth_data['t_truth'].flatten()
 y_truth = truth_data['y_truth'].flatten()
 th_truth = truth_data['th_truth'].flatten()
 
+
 proc_data = loadmat('processed_data.mat')
 l_bearing = proc_data['l_bearing']  # landmark bearing measurements
 l_depth = proc_data['l_depth']  # landmark range measurements
@@ -38,6 +39,7 @@ for i in range(0, np.size(odom_t)):
 x_true = np.interp(odom_t, t_truth, x_truth)
 y_true = np.interp(odom_t, t_truth, y_truth)
 theta_true = np.interp(odom_t, t_truth, th_truth)
+theta_true = (( -theta_true + np.pi) % (2.0 * np.pi ) - np.pi) * -1.0
 
 # Other data to initialize
 x0 = pos_odom_se2[0, 0]
@@ -54,7 +56,10 @@ mu = np.array([x0, y0, theta0])
 
 # initialize particles
 M = 1000  # number of particles
-ki_x = np.random.uniform(-10, 10, M)
-ki_y = np.random.uniform(-10, 10, M)
-ki_th = np.random.uniform(0, 2 * np.pi, M)
+ki_x = np.random.uniform(-5, 5, M)
+ki_y = np.random.uniform(-5, 5, M)
+ki_th = np.random.uniform(-np.pi, np.pi, M)
+# ki_x = np.zeros(M)+x_true[0]
+# ki_y = np.zeros(M)+y_true[0]
+# ki_th = np.zeros(M)+theta_true[0]
 ki = np.array([ki_x, ki_y, ki_th])

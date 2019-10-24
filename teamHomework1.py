@@ -13,17 +13,17 @@ from dataInitialization import *
 rb = rbm(x0, y0, theta0)
 rb_est = rbm(x0, y0, theta0)
 meas = lmm(range_l, bearing_l, landmarks)
-mcl = MCL(M)
+mcl = MCL(M,.05,.05,np.array([0.1,0.05]))
 
 # initialize figures
 fig = plt.figure()
 ax = fig.add_subplot(111, aspect='equal', autoscale_on=False,
-                     xlim=(-10, 10), ylim=(-10, 10))
+                     xlim=(-5, 5), ylim=(-5, 5))
 ax.grid()
 robot_fig = plt.Polygon(rb.getPoints(), fc='g')
 robot_est_fig = plt.Polygon(rb_est.getPoints(), fill=False)
 time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
-ms = 12
+ms = 5
 lmd_figs, = ax.plot([], [], 'bo', ms=ms)
 lmd_meas_figs, = ax.plot([], [], 'ko', fillstyle='none', ms=ms)
 particles, = ax.plot([], [], 'ko', ms=1)
@@ -45,17 +45,14 @@ def init():
 def animate(i):
     global rb, rb_est, ki, meas, t, vel_odom, mu, ms, dt
     # update true robot position
-    print(x_true[i], y_true[i], theta_true[i])
     rb.setState(x_true[i], y_true[i], theta_true[i])
     robot_fig.xy = rb.getPoints()
     state = rb.getState()
-    print(state)
 
     # estimate landmark position
     landmark_estimates = meas.getLandmarkEstimates(state, i)
     lmd_meas_figs.set_data(landmark_estimates[:, 0], landmark_estimates[:, 1])
     lmd_meas_figs.set_markersize(ms)
-
     # particles
     particles.set_data(ki[0, :], ki[1, :])
     particles.set_markersize(1)
