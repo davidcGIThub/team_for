@@ -48,13 +48,16 @@ def animate(i):
     rb_est.setState(x_true[i], y_true[i], theta_true[i])
     robot_fig.xy = rb.getPoints()
     state = rb.getState()
+
     # estimate landmark position
     landmark_estimates = meas.getLandmarkEstimates(state, i)
     lmd_meas_figs.set_data(landmark_estimates[:, 0], landmark_estimates[:, 1])
     lmd_meas_figs.set_markersize(ms)
+
     # particles
     particles.set_data(ki[0, :], ki[1, :])
     particles.set_markersize(1)
+
     # estimate robot motion
     z = meas.getMeasurements(i)
     m = meas.getLandmarks(i)
@@ -64,8 +67,10 @@ def animate(i):
     (ki, mu, P) = mcl.MCL_Localization(ki, u, z, m, dt)
     rb_est.setState(mu[0], mu[1], mu[2])
     robot_est_fig.xy = rb_est.getPoints()
+
     # update time
     time_text.set_text('time = %.1f' % t[i])
+
     # save state information
     x_est[i] = mu[0]
     y_est[i] = mu[1]
