@@ -6,7 +6,7 @@ truth_data = loadmat('truth_data.mat')
 x_truth = truth_data['x_truth'].flatten()
 t_truth = truth_data['t_truth'].flatten()
 y_truth = truth_data['y_truth'].flatten()
-th_truth = truth_data['th_truth'].flatten() - np.pi / 4
+th_truth = truth_data['th_truth'].flatten()
 
 proc_data = loadmat('processed_data.mat')
 l_bearing = proc_data['l_bearing']  # landmark bearing measurements

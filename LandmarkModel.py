@@ -16,8 +16,12 @@ class LandmarkModel:
 
     def getLandmarks(self, index):  # return landmarks (x and y) associated with time index
         id_list = self.getLandmarkIDs(index)
-        x_y_of_landmarks = self.landmarks[id_list]
-        true_dimensions = self.landmarks[id_list].shape[1:3]
+        if np.size(id_list) < 1:
+            return np.array([])
+        print("landmarks", id_list)
+        x_y_of_landmarks = self.landmarks[id_list,:]
+        print("array", x_y_of_landmarks, "shape" , id_list.shape)
+        true_dimensions = (self.landmarks[id_list].shape[0], self.landmarks[id_list].shape[2])
         x_y_of_landmarks = self.landmarks[id_list].reshape(true_dimensions)
         return x_y_of_landmarks
 

@@ -51,10 +51,11 @@ class MCL:
             unique = np.size(np.unique(ki, axis=1))
             P = np.cov(ki_bar)
             n = 3  # number of states
-            if 1.0 * unique / self.M < 0.5:
+            if 1.0 * unique / self.M < 0.1:
                 Q = P / ((1.0 * self.M * unique) ** (1.0 / n))
                 ki = ki + np.dot(Q, np.random.randn(n, self.M))
         else:
             ki = ki_bar
+            P = np.cov(ki_bar)
         mu = np.mean(ki, 1)  # estimated pose (average of pose of particles)
         return ki, mu, P
