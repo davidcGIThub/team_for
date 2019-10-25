@@ -41,12 +41,13 @@ class MCL:
             for i in range(0, np.size(m, 0)):  # loop through each landmark
                 Range = z[i, 0]  # landmark range
                 Bearing = z[i, 1]  # landmark bearing
+                Bearing -= np.pi * 2 * np.floor((Bearing + np.pi) / (2 * np.pi))
                 Range_ki = np.sqrt((m[i, 0] - ki_bar_x) ** 2 + (m[i, 1] - ki_bar_y) ** 2)  # range of the particles
                 Bearing_ki = np.arctan2(m[i, 1] - ki_bar_y, m[i, 0] - ki_bar_x) - ki_bar_th  # bearing of particles
+                Bearing_ki -= np.pi * 2 * np.floor((Bearing_ki + np.pi) / (2 * np.pi))
                 print("Range_Error", np.mean(Range_ki - Range) , "Bearing_Error", np.mean(Bearing_ki - Bearing))
                 prob_R = self.prob_normal_distribution(Range_ki - Range, self.sig_r)  # range probability
                 bearing_diff = Bearing_ki - Bearing
-                bearing_diff -= np.pi * 2 * np.floor((bearing_diff + np.pi) / (2 * np.pi))
                 prob_B = self.prob_normal_distribution(bearing_diff, self.sig_ph)  # bearing probability
                 w = w * prob_R * prob_B # weights
             # Resampling
