@@ -13,7 +13,7 @@ from dataInitialization import *
 rb = rbm(x0, y0, theta0)
 rb_est = rbm(x0, y0, theta0)
 meas = lmm(range_l, bearing_l, landmarks)
-mcl = MCL(M,.1,.05,np.array([0.01,0.005]))
+mcl = MCL(M,sig_r,sig_ph,np.array([alpha1,alpha2]))
 
 # initialize figures
 fig = plt.figure()

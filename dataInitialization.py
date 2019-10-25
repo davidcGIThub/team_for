@@ -65,3 +65,9 @@ ki_th = np.random.uniform(-np.pi, np.pi, M)
 # ki_y = np.zeros(M)+y_true[0]
 # ki_th = np.zeros(M)+theta_true[0]
 ki = np.array([ki_x, ki_y, ki_th])
+
+#noise
+sig_r = 0.1 #range standard deviation
+sig_ph = 0.05 #bearing standard deviation
+alpha1 = 0.01 # x and y noise
+alpha2 = 0.005 # angle noise
